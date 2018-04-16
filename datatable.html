@@ -1,0 +1,342 @@
+<html>
+<head>
+
+	 <link rel="stylesheet" href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.6/css/dataTables.checkboxes.css">
+	 
+	<link href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+
+	<script src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.6/js/dataTables.checkboxes.min.js"></script>
+
+<style type="text/css">
+	#datatable .body_cls {
+	  z-index: 20;
+	}
+
+	#datatable .body_cls #wrapper .save {
+	  display: none;
+	}
+
+	#datatable .body_cls #wrapper tfoot {
+	  display: table-header-group;
+	}
+
+	#datatable .body_cls #wrapper a.paginate_button {
+	  border: 1px solid #000;
+	  background: #000;
+	  color: #fff;
+	  padding: 0 5px;
+	  margin: 0 3px;
+	  cursor: pointer;
+	  -webkit-transition: all 0.25s ease-in-out;
+	  -moz-transition: all 0.25s ease-in-out;
+	  transition: all 0.25s ease-in-out;
+	}
+
+	#datatable .body_cls #wrapper a.paginate_button:hover {
+	  background: #fff;
+	  color: #000;
+	}
+
+	#datatable .body_cls #wrapper a.paginate_button.current {
+	  background: #fff;
+	  color: #000;
+	}
+
+	#datatable .body_cls #wrapper .edit, #datatable .body_cls #wrapper .delete, #datatable .body_cls #wrapper .add, #datatable .body_cls #wrapper .save, #datatable .body_cls #wrapper .info {
+	  background-color: #000;
+	  color: #fff;
+	  border: none;
+	  padding: 5px 10px;
+	  cursor: pointer;
+	  margin: 0 2px;
+	}
+
+	#datatable .info_popup {
+	  display: none;
+	  z-index: 900;
+	  position: fixed;
+	  width: 100%;
+	  height: 100%;
+	  top: 0;
+	  right: 0;
+	}
+
+	#datatable .info_popup h1, #datatable .info_popup .h1 {
+	  text-align: center;
+	}
+
+	#datatable .info_popup .form-detail {
+	  background-color: #fff;
+	  max-width: 330px;
+	  box-shadow: 0 0 30px #555555;
+	  padding: 50px;
+	  width: 100%;
+	  position: absolute;
+	  top: 50%;
+	  right: 50%;
+	  margin: 0 auto;
+	  transform: translate(50%, -50%);
+	}
+
+	#datatable .info_popup .form-detail img {
+	  display: block;
+	  margin: 20px auto;
+	  max-width: 85px;
+	  max-height: 78px;
+	}
+
+	#datatable .info_popup .form-detail .topright {
+	  position: absolute;
+	  top: -18px;
+	  right: -21px;
+	  font-size: 20px;
+	}
+
+	#datatable .info_popup .form-detail .topright a {
+	  border: 1px solid #fff;
+	  background-color: #000;
+	  border-radius: 30px;
+	  padding: 8px 13px;
+	  color: #fff;
+	}
+
+	#datatable .info_popup .form-detail h2, #datatable .info_popup .form-detail .h2 {
+	  text-align: center;
+	}
+
+	#datatable .info_popup .form-detail .form-subscribe input[type=text] {
+	  width: 100% !important;
+	}
+
+	#datatable .info_popup .form-detail .form-subscribe .btn--secondary {
+	  background-color: #000;
+	  border: 1px solid #000;
+	  padding: 7px 14px;
+	}
+
+	#datatable .info_popup .form-detail .form-subscribe .btn--secondary:hover {
+	  background-color: #fff;
+	  color: #000;
+	}
+
+	#datatable .info_popup .form-detail .form-subscribe .email-error {
+	  color: #f00;
+	}
+
+</style>
+</head>
+<body >
+<div id="datatable">
+		<div class="info_popup">
+			<div class="container">
+				<!-- <h1>Popup Module</h1> -->
+				<div class="form-detail">	
+					<h2>User Information</h2>	
+					<p><b>Name:</b><span class="info_name"></span></p>
+					<p><b>Country:</b><span class="info_country"></span></p>
+					<p><b>Age:</b><span class="info_age"></span></p>
+					<div class="topright"><a href="javascript:void(0)" class="" id="close_popup">X</a></div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+		<div class="body_cls" >
+			
+			<div id="wrapper">
+		
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+<!-- <script type="text/javascript"> 
+	
+</script> -->
+<script>
+	$(document).ready(function(){
+        var ckbox = $('#check_id');
+        $('#check_id').on('click',function () {
+            if (ckbox.is(':checked')) {
+                $('.check_cls').prop('checked', true);
+            } else {
+                 $('.check_cls').prop('checked', false);
+            }
+        });
+
+        $("#close_popup").click(function(){
+            $(".info_popup").hide();
+            $(".body_cls").css("opacity","1");
+        });
+
+        $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+                $("#myTable tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+        });
+        $('#data_table tfoot th').not("th:first-child,th:last-child").each( function () {
+             var title = $(this).text();
+             $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+         } );
+
+        // DataTable
+         var otable = $('#data_table').DataTable({
+             "pagingType": "full_numbers",
+             'columnDefs': [
+             {
+                'targets': 0,
+                'checkboxes': {
+                   'selectRow': true
+                }
+             }
+          ],
+          'select': {
+             'style': 'multi'
+          },
+          'order': [[1, 'asc']]
+         });
+
+         // Apply the search
+         otable.columns().every( function () {
+         
+             var that = this;
+             $( 'input', this.footer()).on( 'keyup change', function () {
+                 if ( that.search() !== this.value ) {
+                     that
+                        .search( this.value )
+                        .draw();
+                 }
+             } );
+        });
+    });
+    $.ajax({
+        url: 'users.json',
+        dataType: 'json',
+        success: function( resp ) {
+            console.log(resp);
+            var html = "";
+            html +='<table align="center" cellspacing=2 cellpadding=5 id="data_table" border=1>';
+            html +='<thead>';
+            html +='<tr>';
+            html += '<th> ';
+            // html += '<input id="check_id" type="checkbox" style="display: block;" />';
+            html += '</th>';
+            html +='<th>Name</th>';
+            html +='<th>Country</th>';
+            html +='<th>Age</th>';
+            html +='<th>Opertion</th>';
+            html +='</tr>';
+            html +='</thead>';
+            html +='<tfoot>';
+            html +='    <tr>';
+            html +='    <th>';
+            html +='    </th>';
+            html +='    <th>Name</th>';
+            html +='    <th>Country</th>';
+            html +='    <th>Age</th>';
+            html +='    <th></th>';
+            html +='    </tr>';
+            html +='</tfoot>';
+            html +='<tbody>';
+             for(var i = 0; i < resp.users.length; i++){
+                // html += '<td id="name_row'+i+'">'+resp.users[i].name+'</td><td id="country_row'+i+'">'+resp.users[i].country+'</td><td id="age_row'+i+'">'+resp.users[i].age+'</td>';
+
+                html +='    <tr id="row'+i+'">';
+                html += '   <td></td>';
+                html +='    <td id="name_row'+i+'">'+resp.users[i].name+'</td>';
+                html +='    <td id="country_row'+i+'">'+resp.users[i].country+'</td>';
+                html +='    <td id="age_row'+i+'">'+resp.users[i].age+'</td>';
+                html +='    <td>';
+                html +='    <input type="button" id="info_button'+i+'" value="info" class="info" onclick="info_row('+i+')">';
+                html +='    <input type="button" id="edit_button'+i+'" value="Edit" class="edit" onclick="edit_row('+i+')">';
+                html +='    <input type="button" id="save_button'+i+'" value="Save" class="save" onclick="save_row('+i+')">';
+                html +='    <input type="button" value="Delete" class="delete" onclick="delete_row('+i+')">';
+                html +='    </td>';
+                html +='    </tr>';
+
+            }
+            html +='</tbody>';
+            html += '<tr>';
+            html += '<td></td>';
+            html += '<td><input type="text" id="new_name"></td>';
+            html += '<td><input type="text" id="new_country"></td>';
+            html += '<td><input type="text" id="new_age"></td>';
+            html += '<td><input type="button" class="add" onclick="add_row();" value="Add Row"></td>';
+            html += '</tr>';
+            html += '</table>';
+            $( '#wrapper').html( html );
+        },
+        error: function( req, status, err ) {
+            console.log( 'something went wrong', status, err );
+        }
+    });
+    function edit_row(no)
+    {
+     document.getElementById("edit_button"+no).style.display="none";
+     document.getElementById("save_button"+no).style.display="inline";
+        
+     var name=document.getElementById("name_row"+no);
+     var country=document.getElementById("country_row"+no);
+     var age=document.getElementById("age_row"+no);
+        
+     var name_data=name.innerHTML;
+     var country_data=country.innerHTML;
+     var age_data=age.innerHTML;
+        
+     name.innerHTML="<input type='text' id='name_text"+no+"' value='"+name_data+"'>";
+     country.innerHTML="<input type='text' id='country_text"+no+"' value='"+country_data+"'>";
+     age.innerHTML="<input type='text' id='age_text"+no+"' value='"+age_data+"'>";
+    }
+
+    function save_row(no)
+    {
+        var name_val=document.getElementById("name_text"+no).value;
+        var country_val=document.getElementById("country_text"+no).value;
+        var age_val=document.getElementById("age_text"+no).value;
+
+        document.getElementById("name_row"+no).innerHTML=name_val;
+        document.getElementById("country_row"+no).innerHTML=country_val;
+        document.getElementById("age_row"+no).innerHTML=age_val;
+
+        document.getElementById("edit_button"+no).style.display="inline";
+        document.getElementById("save_button"+no).style.display="none";
+    }
+
+    function delete_row(no)
+    {
+        document.getElementById("row"+no+"").outerHTML="";
+    }
+
+    function info_row(no)
+    {
+        $(".info_popup").show();
+        $(".body_cls").css("opacity","0.2");
+        var name=$("#name_row"+no).html();
+        var country=$("#country_row"+no).html();
+        var age=$("#age_row"+no).html();
+        $(".info_name").html(name);
+        $(".info_country").html(country);
+        $(".info_age").html(age);
+    }
+    function add_row()
+    {
+        var new_name=document.getElementById("new_name").value;
+        var new_country=document.getElementById("new_country").value;
+        var new_age=document.getElementById("new_age").value;
+        if(new_name == "" || new_name == "" || new_country == "")
+        {
+            alert("Please enter all values");
+            return false;
+        }
+        var table=document.getElementById("data_table");
+        var table_len=(table.rows.length)-2;
+        var row = table.insertRow(table_len).outerHTML="<tr id='row"+table_len+"'><td></td><td id='name_row"+table_len+"'>"+new_name+"</td><td id='country_row"+table_len+"'>"+new_country+"</td><td id='age_row"+table_len+"'>"+new_age+"</td><td><input type='button' id='info_button"+table_len+"' value='Info' class='info' onclick='info_row("+table_len+")'><input type='button' id='edit_button"+table_len+"' value='Edit' class='edit' onclick='edit_row("+table_len+")'> <input type='button' id='save_button"+table_len+"' value='Save' class='save' onclick='save_row("+table_len+")'> <input type='button' value='Delete' class='delete' onclick='delete_row("+table_len+")'></td></tr>";
+
+        document.getElementById("new_name").value="";
+        document.getElementById("new_country").value="";
+        document.getElementById("new_age").value="";
+    }
+</script>   
+</html>
